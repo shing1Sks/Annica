@@ -12,101 +12,103 @@ export default function GradientDisplay({ snapshot, settings }: Props) {
   const isVanishing = settings.activationFn === 'sigmoid' && ratio < 0.15 && avgGradOutput > 0.001
 
   function barColor(val: number) {
-    if (val < 0.005) return '#ef4444'
-    if (val < 0.05) return '#f97316'
-    return '#22c55e'
+    if (val < 0.005) return 'var(--negative)'
+    if (val < 0.05)  return 'var(--warning)'
+    return 'var(--update)'
   }
 
   function barWidth(val: number) {
     return Math.min(100, (val / Math.max(avgGradOutput, avgGradHidden, 0.0001)) * 100)
   }
 
+  const s: React.CSSProperties = { padding: '12px 14px', height: '100%', overflowY: 'auto' }
+
   return (
-    <div style={{ padding: '8px 10px' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6b7a99', marginBottom: 8 }}>
+    <div style={s}>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 12 }}>
         Gradient Flow
       </div>
 
       {gradients === null ? (
-        <div style={{ color: '#4a5568', fontSize: 11 }}>Run a backward pass first</div>
+        <div style={{ color: 'var(--muted-2)', fontSize: 11 }}>Run a backward pass to see gradients.</div>
       ) : (
         <>
-          {/* Output layer */}
-          <div style={{ marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3, fontSize: 11 }}>
-              <span style={{ color: '#6b7a99' }}>Output  |∇|</span>
-              <span style={{ color: '#e2e8f0', fontFamily: 'monospace' }}>{avgGradOutput.toFixed(4)}</span>
-            </div>
-            <div style={{ height: 5, background: '#1a1a3a', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: barWidth(avgGradOutput) + '%',
-                background: barColor(avgGradOutput),
-                borderRadius: 3,
-                transition: 'width 0.3s ease',
-              }} />
-            </div>
-          </div>
+          {/* Output layer bar */}
+          <GradBar label="Output |∇|" value={avgGradOutput} width={barWidth(avgGradOutput)} color={barColor(avgGradOutput)} />
+          <GradBar label="Hidden |∇|" value={avgGradHidden} width={barWidth(avgGradHidden)} color={barColor(avgGradHidden)} />
 
-          {/* Hidden layer */}
-          <div style={{ marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3, fontSize: 11 }}>
-              <span style={{ color: '#6b7a99' }}>Hidden  |∇|</span>
-              <span style={{ color: '#e2e8f0', fontFamily: 'monospace' }}>{avgGradHidden.toFixed(4)}</span>
-            </div>
-            <div style={{ height: 5, background: '#1a1a3a', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: barWidth(avgGradHidden) + '%',
-                background: barColor(avgGradHidden),
-                borderRadius: 3,
-                transition: 'width 0.3s ease',
-              }} />
-            </div>
-          </div>
-
-          {/* Ratio */}
-          <div style={{ fontSize: 11, color: '#6b7a99', marginBottom: 6 }}>
-            Ratio: <span style={{ color: '#e2e8f0', fontFamily: 'monospace' }}>{ratio.toFixed(3)}</span>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 10 }}>
+            Ratio (hidden/output): <span style={{ color: 'var(--text)', fontFamily: 'monospace' }}>{ratio.toFixed(3)}</span>
           </div>
 
           {isVanishing && (
             <div style={{
-              background: '#3a1a0a',
-              border: '1px solid #f97316',
-              borderRadius: 5,
-              padding: '5px 8px',
+              background: 'rgba(255,144,64,0.07)',
+              border: '1px solid var(--backward)',
+              borderRadius: 6,
+              padding: '7px 10px',
               fontSize: 11,
-              color: '#f97316',
+              color: 'var(--backward)',
+              marginBottom: 10,
             }}>
-              ⚠ Vanishing gradient! Sigmoid squashes hidden gradients to ~{(ratio * 100).toFixed(0)}% of output.
+              ⚠ Vanishing gradient — sigmoid squashes hidden layer to{' '}
+              <strong>{(ratio * 100).toFixed(0)}%</strong> of output gradient.
             </div>
           )}
 
-          {/* Per-weight gradient peek */}
-          {gradients && (
-            <div style={{ marginTop: 8 }}>
-              <div style={{ fontSize: 10, color: '#4a5568', marginBottom: 4 }}>
-                dW2 (output weights):
-              </div>
-              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                {gradients.dW2[0].map((g, i) => (
-                  <span key={i} style={{
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    background: '#1a1a3a',
-                    borderRadius: 3,
-                    padding: '1px 5px',
-                    color: g > 0 ? '#3b82f6' : '#ef4444',
-                  }}>
-                    {g.toFixed(3)}
-                  </span>
-                ))}
-              </div>
+          {/* dW2 chip row */}
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 5 }}>∂L/∂W₂</div>
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              {gradients.dW2[0].map((g, i) => (
+                <span key={i} style={{
+                  fontFamily: 'monospace', fontSize: 10,
+                  background: 'var(--surface-3)',
+                  border: `1px solid ${g > 0 ? 'var(--positive)' : 'var(--negative)'}`,
+                  borderRadius: 4, padding: '2px 6px',
+                  color: g > 0 ? 'var(--positive)' : 'var(--negative)',
+                }}>
+                  {g > 0 ? '+' : ''}{g.toFixed(3)}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* dW1 chip rows */}
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 5 }}>∂L/∂W₁</div>
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              {gradients.dW1.flatMap((row, i) =>
+                row.map((g, j) => (
+                  <span key={`${i}-${j}`} style={{
+                    fontFamily: 'monospace', fontSize: 10,
+                    background: 'var(--surface-3)',
+                    border: `1px solid ${g > 0 ? 'var(--positive)' : 'var(--negative)'}`,
+                    borderRadius: 4, padding: '2px 6px',
+                    color: g > 0 ? 'var(--positive)' : 'var(--negative)',
+                  }}>
+                    {g > 0 ? '+' : ''}{g.toFixed(3)}
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
         </>
       )}
+    </div>
+  )
+}
+
+function GradBar({ label, value, width, color }: { label: string; value: number; width: number; color: string }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 11 }}>
+        <span style={{ color: 'var(--muted)' }}>{label}</span>
+        <span style={{ color: 'var(--text)', fontFamily: 'monospace' }}>{value.toFixed(5)}</span>
+      </div>
+      <div style={{ height: 5, background: 'var(--surface-3)', borderRadius: 3, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: width + '%', background: color, borderRadius: 3, transition: 'width 0.35s ease' }} />
+      </div>
     </div>
   )
 }

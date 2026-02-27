@@ -1,23 +1,35 @@
 :root {
-  --bg:       #0f0f1a;
-  --panel:    #13132a;
-  --panel2:   #1a1a3a;
-  --border:   #2a2a55;
-  --text:     #e2e8f0;
-  --muted:    #6b7a99;
-  --accent:   #00d4ff;
-  --positive: #3b82f6;
-  --negative: #ef4444;
-  --gradient-col: #f97316;
-  --green:    #22c55e;
+  /* ── Deep Cosmos palette ───────────────────────────────────── */
+  --bg:          #07070f;
+  --surface:     #0e0e1f;
+  --surface-2:   #15152d;
+  --surface-3:   #1c1c3a;
+  --border:      #27274a;
+  --border-2:    #3a3a6a;
+
+  --text:        #dde1ff;
+  --muted:       #5a6090;
+  --muted-2:     #3a3f6a;
+
+  --accent:      #7c83ff;
+  --accent-dim:  #292e6a;
+  --accent-glow: rgba(124,131,255,0.25);
+
+  --positive:    #3dffa0;
+  --negative:    #ff5c78;
+  --forward:     #38b6ff;
+  --backward:    #ff9040;
+  --update:      #50fa7b;
+  --warning:     #ffb86c;
 
   font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
   color: var(--text);
-  background-color: var(--bg);
+  background: var(--bg);
   color-scheme: dark;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 *, *::before, *::after {
@@ -30,83 +42,95 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: var(--bg);
 }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
 
 button {
   cursor: pointer;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel2);
-  color: var(--text);
-  padding: 5px 12px;
-  transition: background 0.15s, border-color 0.15s;
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--muted);
+  padding: 3px 9px;
+  white-space: nowrap;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  line-height: 1.4;
 }
 
 button:hover {
-  background: #24245a;
-  border-color: var(--accent);
+  background: var(--surface-3);
+  border-color: var(--border-2);
+  color: var(--text);
 }
 
-button.active {
-  background: #0d3a5c;
+button.btn-active {
+  background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
 }
 
+button.btn-run {
+  background: rgba(61,255,160,0.1);
+  border-color: var(--positive);
+  color: var(--positive);
+}
+button.btn-run:hover { background: rgba(61,255,160,0.2); }
+
+button.btn-stop {
+  background: rgba(255,92,120,0.1);
+  border-color: var(--negative);
+  color: var(--negative);
+}
+button.btn-stop:hover { background: rgba(255,92,120,0.2); }
+
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: default;
+  pointer-events: none;
 }
 
+/* ── Range inputs ────────────────────────────────────────────── */
+
 input[type='range'] {
-  accent-color: var(--accent);
-  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  vertical-align: middle;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
   cursor: pointer;
 }
+
+/* ── Select ──────────────────────────────────────────────────── */
 
 select {
   font-family: inherit;
-  font-size: 12px;
-  background: var(--panel2);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 8px;
+  border-radius: 5px;
+  padding: 3px 6px;
   cursor: pointer;
+  outline: none;
 }
+select:focus { border-color: var(--accent); }
 
-label {
-  font-size: 11px;
-  color: var(--muted);
-  display: block;
-  margin-bottom: 3px;
-}
+/* ── Scrollbar ───────────────────────────────────────────────── */
 
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  position: relative;
-}
-
-.panel-title {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 5px 10px;
-  border-bottom: 1px solid var(--border);
-  background: var(--panel2);
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 2px;
-}
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }

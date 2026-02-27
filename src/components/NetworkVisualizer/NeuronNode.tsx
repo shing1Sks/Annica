@@ -12,86 +12,72 @@ interface Props {
   label?: string
 }
 
+// #131330 → #7c83ff — deep cosmos indigo ramp
 function activationColor(val: number): string {
   const t = Math.max(0, Math.min(1, Math.abs(val)))
-  const r = Math.round(20 + t * (0 - 20))
-  const g = Math.round(20 + t * (200 - 20))
-  const b = Math.round(80 + t * (255 - 80))
+  const r = Math.round(19 + t * (124 - 19))
+  const g = Math.round(19 + t * (131 - 19))
+  const b = Math.round(48 + t * (255 - 48))
   return `rgb(${r},${g},${b})`
 }
 
 function glowFilter(phase: AnimPhase, layer: number): string {
-  // forward: glow propagates left→right (layer 0 then 1 then 2)
-  // backward: glow propagates right→left
-  if (phase === 'forward') {
-    return 'drop-shadow(0 0 6px rgba(0,212,255,0.8))'
-  }
-  if (phase === 'backward') {
-    if (layer >= 1) return 'drop-shadow(0 0 6px rgba(249,115,22,0.8))'
-  }
-  if (phase === 'update') {
-    return 'drop-shadow(0 0 4px rgba(34,197,94,0.6))'
-  }
+  if (phase === 'forward')  return 'drop-shadow(0 0 8px rgba(56,182,255,0.9))'
+  if (phase === 'backward' && layer >= 1) return 'drop-shadow(0 0 8px rgba(255,144,64,0.9))'
+  if (phase === 'update')   return 'drop-shadow(0 0 6px rgba(80,250,123,0.7))'
   return 'none'
 }
 
 export default function NeuronNode({ cx, cy, r, zVal, aVal, bias, layer, animPhase, label }: Props) {
   const fill = activationColor(aVal)
   const filter = glowFilter(animPhase, layer)
-
-  // Input nodes have no z/a computation
   const isInput = layer === 0
 
   return (
-    <g style={{ filter, transition: 'filter 0.3s ease' }}>
-      {/* Node circle */}
+    <g style={{ filter, transition: 'filter 0.35s ease' }}>
+      {/* Outer glow ring */}
+      <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke="rgba(124,131,255,0.08)" strokeWidth={3} />
+
+      {/* Node body */}
       <circle
-        cx={cx}
-        cy={cy}
-        r={r}
+        cx={cx} cy={cy} r={r}
         fill={fill}
-        stroke="#2a2a55"
+        stroke="#27274a"
         strokeWidth={1.5}
         style={{ transition: 'fill 0.4s ease' }}
       />
 
-      {/* Inner ring highlight */}
+      {/* Specular highlight */}
       <circle
-        cx={cx}
-        cy={cy}
-        r={r - 4}
-        fill="none"
-        stroke="rgba(255,255,255,0.06)"
-        strokeWidth={1}
+        cx={cx - r * 0.25} cy={cy - r * 0.25} r={r * 0.3}
+        fill="rgba(255,255,255,0.05)"
       />
 
       {isInput ? (
-        /* Input: show value */
-        <text x={cx} y={cy + 4} textAnchor="middle" fontSize={11} fill="#e2e8f0" fontFamily="monospace" fontWeight="600">
-          {aVal.toFixed(2)}
+        <text x={cx} y={cy + 5} textAnchor="middle" fontSize={13} fill="#dde1ff" fontFamily="monospace" fontWeight="700">
+          {aVal.toFixed(1)}
         </text>
       ) : (
-        /* Hidden / output: show z and a */
         <>
-          <text x={cx} y={cy - 4} textAnchor="middle" fontSize={8.5} fill="rgba(200,220,255,0.75)" fontFamily="monospace">
+          <text x={cx} y={cy - 4} textAnchor="middle" fontSize={8} fill="rgba(200,210,255,0.6)" fontFamily="monospace">
             z={zVal.toFixed(2)}
           </text>
-          <text x={cx} y={cy + 8} textAnchor="middle" fontSize={9} fill="#e2e8f0" fontFamily="monospace" fontWeight="600">
+          <text x={cx} y={cy + 9} textAnchor="middle" fontSize={9.5} fill="#dde1ff" fontFamily="monospace" fontWeight="700">
             a={aVal.toFixed(2)}
           </text>
         </>
       )}
 
-      {/* Bias indicator (tiny pill below node) */}
+      {/* Bias tag */}
       {!isInput && (
-        <text x={cx} y={cy + r + 10} textAnchor="middle" fontSize={8} fill="#4a5568" fontFamily="monospace">
+        <text x={cx} y={cy + r + 11} textAnchor="middle" fontSize={8} fill="#3a3f6a" fontFamily="monospace">
           b={bias.toFixed(2)}
         </text>
       )}
 
-      {/* Layer label */}
+      {/* Label above node */}
       {label && (
-        <text x={cx} y={cy - r - 6} textAnchor="middle" fontSize={9} fill="#4a5568" fontFamily="system-ui">
+        <text x={cx} y={cy - r - 7} textAnchor="middle" fontSize={11} fill="#5a6090" fontFamily="system-ui" fontWeight="600">
           {label}
         </text>
       )}

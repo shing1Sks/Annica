@@ -1,31 +1,204 @@
+/* ── App shell: flex column, header + main + bottom ─────────── */
+
 #root {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
-.app {
-  display: grid;
+.app-shell {
+  display: flex;
+  flex-direction: column;
   width: 100vw;
   height: 100vh;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 48vh 26vh 26vh;
-  grid-template-areas:
-    "network  network"
-    "loss     boundary"
-    "activation controls";
-  gap: 2px;
-  background: #080811;
-  padding: 2px;
+  background: var(--bg);
 }
 
-.area-network    { grid-area: network; }
-.area-loss       { grid-area: loss; }
-.area-boundary   { grid-area: boundary; }
-.area-activation { grid-area: activation; }
-.area-controls   { grid-area: controls; }
+/* ── Header ─────────────────────────────────────────────────── */
 
-/* ── SVG Edge Animations ─────────────────────────────────────────────── */
+.app-header {
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.hdr-brand {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+
+.hdr-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+.hdr-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.hdr-label {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.hdr-value {
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--text);
+  min-width: 32px;
+}
+
+.hdr-spacer { flex: 1; }
+
+.hdr-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  font-family: monospace;
+}
+
+.hdr-stat-label {
+  font-size: 9px;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.hdr-stat-value {
+  font-size: 12px;
+  color: var(--accent);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.hdr-phase {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.hdr-phase.phase-forward  { color: var(--forward);  border-color: var(--forward);  background: rgba(56,182,255,0.08); }
+.hdr-phase.phase-backward { color: var(--backward); border-color: var(--backward); background: rgba(255,144,64,0.08); }
+.hdr-phase.phase-update   { color: var(--update);   border-color: var(--update);   background: rgba(80,250,123,0.08); }
+
+.hdr-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hdr-dot.dot-idle     { background: var(--muted-2); }
+.hdr-dot.dot-forward  { background: var(--forward);  box-shadow: 0 0 5px var(--forward); }
+.hdr-dot.dot-backward { background: var(--backward); box-shadow: 0 0 5px var(--backward); }
+.hdr-dot.dot-update   { background: var(--update);   box-shadow: 0 0 5px var(--update); }
+.hdr-dot.dot-running  { background: var(--positive); box-shadow: 0 0 5px var(--positive); animation: pulseDot 1s ease-in-out infinite; }
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.hdr-slider {
+  width: 64px;
+}
+
+/* ── Main area (network takes all space) ─────────────────────── */
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg);
+}
+
+/* ── Bottom panel (tabbed, collapsable) ──────────────────────── */
+
+.app-bottom {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+  transition: height 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-tab-bar {
+  height: 36px;
+  display: flex;
+  align-items: stretch;
+  padding: 0 8px;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.bottom-tab {
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bottom-tab:hover {
+  color: var(--text);
+  background: transparent;
+  border-color: var(--border-2);
+}
+
+.bottom-tab.tab-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: transparent;
+}
+
+.bottom-tab-spacer { flex: 1; }
+
+.bottom-collapse-btn {
+  align-self: center;
+  padding: 2px 8px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.bottom-content {
+  height: calc(100% - 36px);
+  overflow: hidden;
+}
+
+/* ── SVG Edge Animations ─────────────────────────────────────── */
 
 @keyframes dashForward {
   from { stroke-dashoffset: 24; }
@@ -37,14 +210,19 @@
   to   { stroke-dashoffset: 24; }
 }
 
-@keyframes nodeGlow {
-  0%, 100% { filter: drop-shadow(0 0 3px var(--accent)); }
-  50%       { filter: drop-shadow(0 0 10px var(--accent)); }
+@keyframes nodeGlowForward {
+  0%, 100% { filter: drop-shadow(0 0 4px #38b6ff); }
+  50%       { filter: drop-shadow(0 0 12px #38b6ff); }
 }
 
-@keyframes nodeGlowOrange {
-  0%, 100% { filter: drop-shadow(0 0 3px var(--gradient-col)); }
-  50%       { filter: drop-shadow(0 0 10px var(--gradient-col)); }
+@keyframes nodeGlowBackward {
+  0%, 100% { filter: drop-shadow(0 0 4px #ff9040); }
+  50%       { filter: drop-shadow(0 0 12px #ff9040); }
+}
+
+@keyframes nodeGlowUpdate {
+  0%, 100% { filter: drop-shadow(0 0 4px #50fa7b); }
+  50%       { filter: drop-shadow(0 0 10px #50fa7b); }
 }
 
 @keyframes fadeIn {
@@ -52,24 +230,11 @@
   to   { opacity: 1; }
 }
 
-.edge-anim-forward {
-  stroke-dasharray: 8 6;
-  animation: dashForward 0.35s linear infinite;
-}
+.edge-anim-forward  { stroke-dasharray: 8 6; animation: dashForward  0.35s linear infinite; }
+.edge-anim-backward { stroke-dasharray: 8 6; animation: dashBackward 0.35s linear infinite; }
 
-.edge-anim-backward {
-  stroke-dasharray: 8 6;
-  animation: dashBackward 0.35s linear infinite;
-}
+.node-anim-forward  { animation: nodeGlowForward  0.8s ease-in-out infinite; }
+.node-anim-backward { animation: nodeGlowBackward 0.8s ease-in-out infinite; }
+.node-anim-update   { animation: nodeGlowUpdate   0.8s ease-in-out infinite; }
 
-.node-anim-forward {
-  animation: nodeGlow 0.8s ease-in-out infinite;
-}
-
-.node-anim-backward {
-  animation: nodeGlowOrange 0.8s ease-in-out infinite;
-}
-
-.gradient-label {
-  animation: fadeIn 0.3s ease forwards;
-}
+.gradient-label { animation: fadeIn 0.25s ease forwards; }

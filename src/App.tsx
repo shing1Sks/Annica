@@ -1,44 +1,28 @@
 import './App.css'
 import { useNNStore } from './store/useNNStore'
 import NetworkVisualizer from './components/NetworkVisualizer'
-import LossPlot from './components/LossPlot'
-import DecisionBoundary from './components/DecisionBoundary'
-import ActivationExplorer from './components/ActivationExplorer'
-import Controls from './components/Controls'
+import Header from './components/Header'
+import BottomPanel from './components/BottomPanel'
 
 function App() {
   const store = useNNStore()
 
   return (
-    <div className="app">
-      <div className="area-network panel">
+    <div className="app-shell">
+      <header className="app-header">
+        <Header store={store} />
+      </header>
+
+      <main className="app-main">
         <NetworkVisualizer
           snapshot={store.snapshot}
           animPhase={store.animPhase}
           settings={store.settings}
           onWeightChange={store.overrideWeight}
         />
-      </div>
+      </main>
 
-      <div className="area-loss panel">
-        <LossPlot lossHistory={store.snapshot.lossHistory} epoch={store.snapshot.epoch} />
-      </div>
-
-      <div className="area-boundary panel">
-        <DecisionBoundary
-          weights={store.snapshot.weights}
-          settings={store.settings}
-          epoch={store.snapshot.epoch}
-        />
-      </div>
-
-      <div className="area-activation panel">
-        <ActivationExplorer settings={store.settings} />
-      </div>
-
-      <div className="area-controls panel">
-        <Controls store={store} />
-      </div>
+      <BottomPanel store={store} />
     </div>
   )
 }

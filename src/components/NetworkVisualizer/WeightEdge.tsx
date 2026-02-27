@@ -2,58 +2,49 @@ import { useState } from 'react'
 import type { AnimPhase } from '../../core/types'
 
 interface Props {
-  x1: number
-  y1: number
-  x2: number
-  y2: number
+  x1: number; y1: number
+  x2: number; y2: number
   weight: number
   maxAbsWeight: number
   gradient: number | null
   animPhase: AnimPhase
-  layer: number          // 0 = input→hidden, 1 = hidden→output
+  layer: number
   isManualMode: boolean
   onWeightChange: (val: number) => void
 }
 
 function edgeColor(w: number): string {
-  return w >= 0 ? '#3b82f6' : '#ef4444'
+  return w >= 0 ? '#3dffa0' : '#ff5c78'  // mint / rose
 }
 
 function edgeOpacity(w: number, maxAbs: number): number {
-  if (maxAbs === 0) return 0.3
-  return 0.2 + 0.75 * (Math.abs(w) / maxAbs)
+  if (maxAbs === 0) return 0.25
+  return 0.18 + 0.78 * (Math.abs(w) / maxAbs)
 }
 
 function edgeWidth(w: number, maxAbs: number): number {
   if (maxAbs === 0) return 1
-  return 1 + 4.5 * (Math.abs(w) / maxAbs)
+  return 1 + 5 * (Math.abs(w) / maxAbs)
 }
 
 export default function WeightEdge({
   x1, y1, x2, y2,
-  weight, maxAbsWeight,
-  gradient,
-  animPhase, layer,
-  isManualMode,
-  onWeightChange,
+  weight, maxAbsWeight, gradient,
+  animPhase, isManualMode, onWeightChange,
 }: Props) {
   const [editing, setEditing] = useState(false)
   const [inputVal, setInputVal] = useState('')
   const [hovered, setHovered] = useState(false)
 
-  const color = edgeColor(weight)
+  const color   = edgeColor(weight)
   const opacity = edgeOpacity(weight, maxAbsWeight)
   const strokeW = edgeWidth(weight, maxAbsWeight)
-
   const midX = (x1 + x2) / 2
   const midY = (y1 + y2) / 2
 
-  // Animation overlay class
-  let animClass = ''
-  if (animPhase === 'forward') animClass = 'edge-anim-forward'
-  else if (animPhase === 'backward') animClass = 'edge-anim-backward'
-
-  const animColor = animPhase === 'forward' ? '#00d4ff' : '#f97316'
+  const isForwardAnim  = animPhase === 'forward'
+  const isBackwardAnim = animPhase === 'backward'
+  const animColor = isForwardAnim ? '#38b6ff' : '#ff9040'
 
   function handleClick() {
     if (!isManualMode) return
@@ -75,63 +66,68 @@ export default function WeightEdge({
         stroke={color}
         strokeWidth={strokeW}
         strokeOpacity={opacity}
+        strokeLinecap="round"
         style={{ transition: 'stroke-width 0.3s ease, stroke-opacity 0.3s ease' }}
       />
 
-      {/* Animation overlay */}
-      {(animPhase === 'forward' && layer === 0) || (animPhase === 'forward' && layer === 1) ? (
+      {/* Forward animation overlay */}
+      {isForwardAnim && (
         <line
           x1={x1} y1={y1} x2={x2} y2={y2}
           stroke={animColor}
-          strokeWidth={2}
-          strokeOpacity={0.85}
-          className={animClass}
+          strokeWidth={2.5}
+          strokeOpacity={0.9}
+          strokeLinecap="round"
+          className="edge-anim-forward"
         />
-      ) : null}
-      {(animPhase === 'backward' && layer === 1) || (animPhase === 'backward' && layer === 0) ? (
+      )}
+
+      {/* Backward animation overlay (reversed direction) */}
+      {isBackwardAnim && (
         <line
           x1={x2} y1={y2} x2={x1} y2={y1}
           stroke={animColor}
-          strokeWidth={2}
-          strokeOpacity={0.85}
-          className={animClass}
+          strokeWidth={2.5}
+          strokeOpacity={0.9}
+          strokeLinecap="round"
+          className="edge-anim-backward"
         />
-      ) : null}
+      )}
 
-      {/* Clickable hit area */}
+      {/* Manual mode + hover hit area */}
       <line
         x1={x1} y1={y1} x2={x2} y2={y2}
         stroke="transparent"
-        strokeWidth={12}
+        strokeWidth={14}
         style={{ cursor: isManualMode ? 'pointer' : 'default' }}
         onClick={handleClick}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       />
 
-      {/* Weight label on hover */}
+      {/* Weight tooltip on hover */}
       {hovered && !editing && (
         <g>
-          <rect x={midX - 22} y={midY - 10} width={44} height={14} rx={3} fill="#1a1a3a" fillOpacity={0.92} />
+          <rect x={midX - 24} y={midY - 10} width={48} height={14} rx={3} fill="#15152d" fillOpacity={0.95} stroke="#27274a" strokeWidth={0.5} />
           <text x={midX} y={midY + 1} textAnchor="middle" fontSize={9} fill={color} fontFamily="monospace">
             w={weight.toFixed(3)}
           </text>
         </g>
       )}
 
-      {/* Gradient label during backward phase */}
-      {animPhase === 'backward' && gradient !== null && !editing && (
+      {/* Gradient annotation during backward phase */}
+      {isBackwardAnim && gradient !== null && !editing && !hovered && (
         <g className="gradient-label">
-          <rect x={midX - 28} y={midY - 10} width={56} height={14} rx={3} fill="#2a1a0a" fillOpacity={0.92} />
-          <text x={midX} y={midY + 1} textAnchor="middle" fontSize={9} fill="#f97316" fontFamily="monospace">
+          <rect x={midX - 28} y={midY - 10} width={56} height={14} rx={3} fill="#1a0f04" fillOpacity={0.95} stroke="#ff9040" strokeWidth={0.5} />
+          <text x={midX} y={midY + 1} textAnchor="middle" fontSize={9} fill="#ff9040" fontFamily="monospace">
             ∂={gradient.toFixed(3)}
           </text>
         </g>
       )}
 
-      {/* Manual edit input */}
+      {/* Manual weight editor */}
       {editing && (
-        <foreignObject x={midX - 36} y={midY - 13} width={72} height={26}>
+        <foreignObject x={midX - 38} y={midY - 14} width={76} height={28}>
           <input
             type="number"
             step="0.01"
@@ -144,12 +140,11 @@ export default function WeightEdge({
             }}
             autoFocus
             style={{
-              width: '100%',
-              height: '100%',
-              background: '#0d3a5c',
-              border: '1px solid #00d4ff',
+              width: '100%', height: '100%',
+              background: '#0d1240',
+              border: '1px solid #7c83ff',
               borderRadius: 4,
-              color: '#00d4ff',
+              color: '#7c83ff',
               fontSize: 11,
               textAlign: 'center',
               fontFamily: 'monospace',

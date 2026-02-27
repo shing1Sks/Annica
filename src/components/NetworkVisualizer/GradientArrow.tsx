@@ -35,18 +35,18 @@ export default function GradientArrow({ x1, y1, x2, y2, value, visible }: Props)
       {/* Arrow shaft */}
       <line
         x1={x2} y1={y2} x2={x1} y2={y1}
-        stroke="#f97316"
+        stroke="#ff9040"
         strokeWidth={1.5}
         strokeDasharray="4 3"
-        strokeOpacity={0.8}
+        strokeOpacity={0.85}
       />
       {/* Arrow head */}
-      <line x1={x1} y1={y1} x2={ax1} y2={ay1} stroke="#f97316" strokeWidth={1.5} />
-      <line x1={x1} y1={y1} x2={ax2} y2={ay2} stroke="#f97316" strokeWidth={1.5} />
+      <line x1={x1} y1={y1} x2={ax1} y2={ay1} stroke="#ff9040" strokeWidth={1.5} />
+      <line x1={x1} y1={y1} x2={ax2} y2={ay2} stroke="#ff9040" strokeWidth={1.5} />
 
       {/* Gradient value */}
-      <rect x={midX - 20} y={midY - 9} width={40} height={12} rx={2} fill="#1a0d05" fillOpacity={0.9} />
-      <text x={midX} y={midY} textAnchor="middle" fontSize={8} fill="#f97316" fontFamily="monospace">
+      <rect x={midX - 20} y={midY - 9} width={40} height={12} rx={2} fill="#130a04" fillOpacity={0.95} />
+      <text x={midX} y={midY} textAnchor="middle" fontSize={8} fill="#ff9040" fontFamily="monospace">
         {value > 0 ? '+' : ''}{value.toFixed(3)}
       </text>
     </g>
