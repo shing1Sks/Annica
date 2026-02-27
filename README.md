@@ -1,6 +1,6 @@
 # ANNICA
 
-**A Neural Network Interactive Classroom & Animator** — an in-browser playground for understanding how neural networks learn, one step at a time.
+**Artificial Neural Network's Interactive Computed Animations** — an in-browser playground for understanding how neural networks learn, one step at a time.
 
 ANNICA trains a 2-layer feedforward network on the XOR problem and makes every part of the process visible: weight magnitudes, gradient flow, activation functions, decision boundaries, and more. No ML libraries, no black boxes — just pure TypeScript math rendered live in your browser.
 
