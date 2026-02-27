@@ -1,34 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { useNNStore } from './store/useNNStore'
+import NetworkVisualizer from './components/NetworkVisualizer'
+import LossPlot from './components/LossPlot'
+import DecisionBoundary from './components/DecisionBoundary'
+import ActivationExplorer from './components/ActivationExplorer'
+import Controls from './components/Controls'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const store = useNNStore()
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="app">
+      <div className="area-network panel">
+        <NetworkVisualizer
+          snapshot={store.snapshot}
+          animPhase={store.animPhase}
+          settings={store.settings}
+          onWeightChange={store.overrideWeight}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+      <div className="area-loss panel">
+        <LossPlot lossHistory={store.snapshot.lossHistory} epoch={store.snapshot.epoch} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <div className="area-boundary panel">
+        <DecisionBoundary
+          weights={store.snapshot.weights}
+          settings={store.settings}
+          epoch={store.snapshot.epoch}
+        />
+      </div>
+
+      <div className="area-activation panel">
+        <ActivationExplorer settings={store.settings} />
+      </div>
+
+      <div className="area-controls panel">
+        <Controls store={store} />
+      </div>
+    </div>
   )
 }
 
